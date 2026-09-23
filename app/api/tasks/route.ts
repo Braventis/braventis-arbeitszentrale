@@ -7,6 +7,7 @@ const SOURCES=["Monatsplan","Kunde","Projekt","Aufgabenpool","Intern"];
 const tasksId=process.env.NOTION_TASKS_DATA_SOURCE_ID;
 
 function text(value:unknown){return String(value??"").trim();}
+function normalizeId(value:unknown){return text(value).replace(/-/g,"").toLowerCase();}
 function allowed(value:unknown,values:string[],fallback:string){const candidate=text(value);return values.includes(candidate)?candidate:fallback;}
 function validDate(value:unknown){const candidate=text(value);return /^\d{4}-\d{2}-\d{2}$/.test(candidate)?candidate:"";}
 function ready(){return notionConfigured&&Boolean(tasksId);}
@@ -21,7 +22,7 @@ function properties(body:Record<string,unknown>,partial=false){
 }
 async function assertTaskPage(id:string){
   const page=await getDataSourcePage(id);
-  if(page?.parent?.type!=="data_source_id"||page.parent.data_source_id!==tasksId)throw new Error("Diese Seite gehört nicht zur Aufgaben-Datenbank.");
+  if(page?.parent?.type!=="data_source_id"||normalizeId(page.parent.data_source_id)!==normalizeId(tasksId))throw new Error("Diese Seite gehört nicht zur Aufgaben-Datenbank.");
 }
 
 export async function POST(req:NextRequest){
