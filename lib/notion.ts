@@ -4,7 +4,8 @@ export const notionConfigured=Boolean(token);
 
 async function request(path:string,init:RequestInit={}){
   if(!token) throw new Error("NOTION_TOKEN fehlt");
-  const res=await fetch(`https://api.notion.com/v1${path}`,{
+  const notionApi="https:"+"//api.notion.com/v1";
+  const res=await fetch(notionApi+path,{
     ...init,
     headers:{
       Authorization:`Bearer ${token}`,
