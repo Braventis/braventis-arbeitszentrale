@@ -7,33 +7,18 @@ async function request(path:string,init:RequestInit={}){
   const notionApi="https:"+"//api.notion.com/v1";
   const res=await fetch(notionApi+path,{
     ...init,
-    headers:{
-      Authorization:`Bearer ${token}`,
-      "Notion-Version":NOTION_VERSION,
-      "Content-Type":"application/json",
-      ...(init.headers||{})
-    },
+    headers:{Authorization:`Bearer ${token}`,"Notion-Version":NOTION_VERSION,"Content-Type":"application/json",...(init.headers||{})},
     cache:"no-store"
   });
   if(!res.ok) throw new Error(`Notion ${res.status}: ${await res.text()}`);
   return res.json();
 }
 
-export async function queryDataSource(id:string,body:Record<string,unknown>={}){
-  return request(`/data_sources/${id}/query`,{method:"POST",body:JSON.stringify({page_size:50,...body})});
-}
-
-export async function createDataSourcePage(id:string,properties:Record<string,unknown>,children?:unknown[]){
-  return request("/pages",{method:"POST",body:JSON.stringify({parent:{type:"data_source_id",data_source_id:id},properties,...(children?{children}:{})})});
-}
-
-export async function updateDataSourcePage(id:string,properties:Record<string,unknown>){
-  return request(`/pages/${id}`,{method:"PATCH",body:JSON.stringify({properties})});
-}
-
-export async function trashDataSourcePage(id:string){
-  return request(`/pages/${id}`,{method:"PATCH",body:JSON.stringify({in_trash:true})});
-}
+export async function queryDataSource(id:string,body:Record<string,unknown>={}){return request(`/data_sources/${id}/query`,{method:"POST",body:JSON.stringify({page_size:50,...body})});}
+export async function getDataSourcePage(id:string){return request(`/pages/${id}`);}
+export async function createDataSourcePage(id:string,properties:Record<string,unknown>,children?:unknown[]){return request("/pages",{method:"POST",body:JSON.stringify({parent:{type:"data_source_id",data_source_id:id},properties,...(children?{children}:{})})});}
+export async function updateDataSourcePage(id:string,properties:Record<string,unknown>){return request(`/pages/${id}`,{method:"PATCH",body:JSON.stringify({properties})});}
+export async function trashDataSourcePage(id:string){return request(`/pages/${id}`,{method:"PATCH",body:JSON.stringify({in_trash:true})});}
 
 export function plain(prop:any):string{
   if(!prop)return"";
